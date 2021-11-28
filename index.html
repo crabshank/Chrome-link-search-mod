@@ -1,213 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Quick history and bookmark URL search</title>
-    <link rel="stylesheet" href="assets/style.css">
+		<title>Quick history URL search</title>
+		<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+		<div class="container">
 
-
-<div class="container">
-    <div class="tab">
-        <button class="tablinks active" data-name="historyContainer">History</button>
-        <button class="tablinks" data-name="bookmarkContainer">Bookmark</button>
-        <button class="tablinks" data-name="tabContainer">Tabs</button>
-        <button class="tablinks" data-name="othersContainer">Browser Options</button>
-    </div>
-
-    <div id="historyContainer" class="tabcontent" style="display: block;">
-        <div>
-            <form id="searchForm" class="searchForm" method="post">
-                <input type="text" id="searchTerm" name="searchTerm" placeholder="Search history">
-
-                <input id="website" list="websiteData" old-value="" placeholder="Website">
-                <datalist id="websiteData">
-                </datalist>
-                <select id="time_filter" class="time_filter" style="width: 160px;">
-                    <optgroup label="Current week">
-                        <option value="0-d">Today</option>
-                        <option value="1-d">1 day ago</option>
-                        <option value="2-d">2 days ago</option>
-                        <option value="3-d">3 days ago</option>
-                        <option value="4-d">4 days ago</option>
-                        <option value="5-d">5 days ago</option>
-                        <option value="6-d">6 days ago</option>
-                    </optgroup>
-
-                    <option selected value="1-w">1 week ago</option>
-                    <option value="2-w">2 weeks ago</option>
-                    <option value="3-w">3 weeks ago</option>
-                    <option value="4-w">4 weeks ago</option>
-                    <option value="5-w">5 weeks ago</option>
-                    <option value="6-w">6 weeks ago</option>
-                    <option value="7-w">7 weeks ago</option>
-                    <option value="8-w">8 weeks ago</option>
-                </select>
-                <select id="limit" class="limit" style="width: 70px;">
-                    <option>Select number of items</option>
-                    <option value="20">20</option>
-                    <option selected value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                    <option value="300">300</option>
-                </select>
-            </form>
-        </div>
-        <table class="item_table">
-            <thead>
-            <tr>
-                <th class="select">
-                    <input type="checkbox" id="allHistories" name="all_histories">
-                </th>
-                <th>
-                    <span class="th-nav"><button id="removeHistory" class="action">Remove history record</button></span>
-                    <span class="th-nav th-manage"> <a class="linkTo" href="chrome://history/">Manage History</a></span>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-                <tr class="noData">
-                    <td colspan="2"><p>No history found</p></td>
-                <tr>
-
-            </tbody>
-        </table>
-    </div>
-    <div id="bookmarkContainer" class="tabcontent" style="display: none;">
-        <table class="item_table">
-            <thead>
-            <tr>
-                <th class="select">
-                    <input type="checkbox" id="allBookmarks" name="all_bookmarks">
-                </th>
-                <th>
-                    <span class="th-nav"><button id="removeBookmark" class="action">Remove bookmark record</button></span>
-                    <span class="th-nav th-manage"> <a class="linkTo" href="chrome://bookmarks/">Manage Bookmark</a>
-                    </span>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
-    </div>
-    <div id="tabContainer" class="tabcontent" style="display: none;">
-        <table class="item_table">
-            <thead>
-            <tr>
-                <th class="select">
-                    <input type="checkbox" id="allTabs" name="all_tabs">
-                </th>
-                <th>
-                    <span class="th-nav"><button id="removeTab" class="action">Close tab</button></span>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
-    </div>
-    <div id="othersContainer" class="tabcontent" style="display: none;">
-        <table id="otherOptionsTable" class="item_table">
-            <thead style="display: none">
-            <tr>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="even">
-                <td class="info"><p><a class="linkTo" href="chrome://history/">Manage History</a></p></td>
-            </tr>
-            <tr class="odd">
-                <td class="info"><p><a class="linkTo" href="chrome://settings/clearBrowserData">Clear browsing data</a></p></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-
-<table id="coreItemTable" style="display: none;">
-    <tbody>
-
-    <tr class="item core_history_item">
-        <td class="select"><input type="checkbox" name="history[]" value=""></td>
-        <td colspan="2" class="info">
-            <p class="info_title">
-                <span class="icon favicon" style=""></span>
-                <a class="title" target="_blank" href=""></a>
-            </p>
-            <p class="info_time">
-                <span class="icon time" style=""></span> Last Visit Time on :
-                <span class="time_info"></span>
-            </p>
-            <p class="info_url">
-                <span class="icon url"></span>
-                <a class="full_url" target="_blank"
-                   href="#"></a>
-            </p>
-        </td>
-    </tr>
-    <tr class="item core_bookmark_item">
-        <td class="select"><input type="checkbox" name="bookmark[]" value=""></td>
-        <td class="info">
-            <p class="info_title">
-                <span class="icon favicon"></span>
-                <a class="title" target="_blank" href="#">
-                </a>
-            </p>
-            <p class="info_folder">
-                <span class="icon folder"></span>
-                <span class="folder_container"></span>
-            </p>
-            <p class="info_url">
-                <span class="icon url"></span>
-                <a class="full_url" target="_blank"
-                   href="#"></a>
-            </p>
-        </td>
-    </tr>
-    <tr class="item core_tab_item">
-        <td class="select"><input type="checkbox" name="tab[]" value=""></td>
-        <td class="info">
-            <p class="info_title">
-                <span class="icon favicon"></span>
-                <a class="title goto" name="selected" href="javascript:void(0);">
-                </a>
-            </p>
-            <p class="tabActions">
-                <input type="checkbox" name="active">
-                <span class="folder_container">Active</span>
-<!--                <input type="checkbox" name="muted">
-                <span class="folder_container">Muted</span>-->
-                <input type="checkbox" name="autoDiscardable">
-                <span class="folder_container">Auto Discardable</span>
-                <input type="checkbox" name="pinned">
-                <span class="folder_container">Pinned</span>
-            </p>
-
-        </td>
-    </tr>
-    </tbody>
-</table>
-<div id="bookmarkDatatableFilters" style="display: none;">
-    <div class="filterByWebsite">
-        <input id="bookmarkWebsite" old-value="" list="bookmarkWebsiteData" placeholder="Website">
-        <datalist id="bookmarkWebsiteData">
-    </div>
-</div>
-
-<div id="tabDatatableFilters" style="display: none;">
-    <div class="filterByWebsite">
-        <input id="tabWebsite" old-value="" list="tabWebsiteData" placeholder="Website">
-        <datalist id="tabWebsiteData">
-    </div>
-</div>
-
-<script src="assets/jquery-3.3.1.js"></script>
-<script src="assets/jquery.dataTables.min.js"></script>
-<script src="assets/script.js"></script>
+		<div class="tab">
+			<button class="tablinks active" data-name="historyContainer">History</button>
+		</div>
+		
+		
+		<div id="historyContainer" class="tabcontent" style="display: block;">
+			
+			<div>
+			
+				<section id="searchForm" class="searchForm">
+					<section id="textFilt">
+						<input type="text" autocomplete="off" id="searchTerm" name="searchTerm" placeholder="Search history (includes domain filtering)"><button id="clearTerm">Clear</button>
+					</section>
+						<div id="multiselect">
+								<div id="selectBox">Select domains</div>
+							<div id="checkboxes">
+							</div>
+						</div>
+						<hr id="divider">
+				</section>
+				
+			</div>
+			
+			
+			<table class="item_table">
+			
+				<thead>
+					<tr>
+						<th class="select">
+							<input type="checkbox" id="allHistories" name="all_histories">
+						</th>
+						<th>
+							<span class="th-nav"><button id="removeHistory" class="action">Remove history records</button></span>
+							<span class="th-nav th-manage"> <a class="linkTo" href="chrome://history/">Manage History</a></span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="noData">
+						<td colspan="2">
+							<p style="margin-left: 2px;">No history found</p>
+						</td>
+					<tr>
+				</tbody>
+			</table>
+			
+		</div>
+		
+		
+		
+		<table id="coreItemTable" style="display: none;">
+			<tbody>
+				<tr class="item core_history_item">
+					<td class="select"><input type="checkbox" name="history[]" value=""></td>
+					<td colspan="2" class="info">
+						<p class="info_title">
+							<!-- <span class="icon favicon" style=""></span> -->
+							<a class="title" target="_blank" href=""></a>
+						</p>
+						<p class="info_time">
+							<span class="icon time" style=""></span> Last Visit Time on :
+							<span class="time_info"></span>
+						</p>
+						<p class="info_url">
+							<span class="icon url"></span>
+							<a class="full_url" target="_blank"
+								href="#"></a>
+						</p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<script src="assets/jquery-3.6.0.min.js"></script>
+		<script src="assets/script.js"></script>
 </body>
 </html>
