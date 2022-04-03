@@ -452,8 +452,10 @@ if(chkd.length>=1){
 							opn();
 		}else if(e.target.id==='copyLinks'){
 			let cpy='';
-			for (let i=0; i<chkd.length-1; i++) {
-				cpy+=chkd[chkd.length-1].value+'\n';
+			if(chkd.length>1){
+				for (let i=0; i<chkd.length-1; i++) {
+					cpy+=chkd[i].value+'\n';
+				}
 			}
 			cpy+=chkd[chkd.length-1].value;		
 	let txt = document.createElement("textarea");
