@@ -38,8 +38,10 @@
 						<th class="select">
 							<input type="checkbox" id="allHistories" name="all_histories">
 						</th>
-						<th>
-							<span class="th-nav"><button id="removeHistory" class="action">Remove history records</button></span>
+						<th style="display: flex;align-items: center;">
+							<span class="th-nav"><button id="removeHistory" class="action left">Remove history records</button></span>
+							<span class="th-nav"><button id="openLinks" class="action right">Open all selected links</button></span>
+							<span class="th-nav"><button id="copyLinks" class="action right">Copy all selected links to clipboard</button></span>
 							<span class="th-nav th-manage"> <a class="linkTo" href="chrome://history/">Manage History</a></span>
 						</th>
 					</tr>

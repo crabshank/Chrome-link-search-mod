@@ -5,7 +5,7 @@
   "short_name": "Link search",
   "description": "Easily search your browser history, bookmark, tab in all windows and useful chrome options links",
   "manifest_version": 3,
-  "version": "2021.11",
+  "version": "2022.4",
   "offline_enabled": true,
   "action": {
     "default_icon": "assets/icons/searchHistory128.png",
@@ -14,7 +14,11 @@
   },
 
   "permissions": [
-    "history"
+    "history",
+	"processes",
+	"tabs",
+	"activeTab",
+	"clipboardWrite"
   ],
   "icons": {
     "128": "assets/icons/searchHistory128.png"
