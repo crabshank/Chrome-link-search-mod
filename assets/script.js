@@ -12,6 +12,14 @@ sb.push(sa[k]);
 return sb;
 }
 
+function elRemover(el){
+	if(typeof el!=='undefined' && !!el){
+	if(typeof el.parentNode!=='undefined' && !!el.parentNode){
+		el.parentNode.removeChild(el);
+	}
+	}
+}
+
 var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) {
 	if((clear && !reGatherChecked) || startUp){
 		 buildNavigationOptions();
@@ -289,6 +297,7 @@ var getVisitTime = function (item) {
 
 }
 
+/*
 var getFolders = function (paths, arr) {
 
     if (paths.id != 0) {
@@ -300,6 +309,7 @@ var getFolders = function (paths, arr) {
 
     return arr;
 }
+*/
 
 var resetRemoveCheckBoxes = function (recordType) {
     $("#" + recordType + "Container tr input[type='checkbox']").prop('checked', false);
@@ -385,7 +395,7 @@ function showCheckboxes() {
 
     });
 
-   $(".action").on("click", function () {
+   $(".action").on("click", function (e) {
         var recordType = getRecordType(this);
         var items = $("#" + recordType + "Container tr.item input[name='" + recordType + "[]']");
 
@@ -408,30 +418,66 @@ function showCheckboxes() {
 							}).then((result) => {;}).catch((result) => {;});
 						}
 				}
-				var chk=true;
-if(chkd.length>1){
-	chk = confirm("Are you sure you want to delete multiple entries?");
-}
-	if (chk) {
-					del();
-			
-		$(this).prop('checked', false).closest('tr.item').hide();
-
-					/*	$("#searchTerm")[0].value='';
-						$("input#allHistories")[0].checked=false;
-						  expanded = true;
-						   showCheckboxes();
-							searchHistory([''],true,false,true,true);*/
-							
-						items = $("#" + recordType + "Container tr.item input[name='" + recordType + "[]']");
-						if ($(this).is(":checked")) {
-							items.prop('checked', true);
-						}else{
-							items.prop('checked', false);
+				
+				async function opn() {
+					if(chkd.length>0){
+								await new Promise(function(resolve, reject) {
+									var count=0;
+									for (let i=0; i<chkd.length; i++) {
+											chrome.tabs.create({
+												url: chkd[i].value,
+												active: false		
+											}, function(tab){
+												count++;
+												if(count==chkd.length){
+													resolve();
+												}
+											});
+									}
+							}).then((result) => {;}).catch((result) => {;});
 						}
-						updateRemoveButton(recordType);
+				}
 
+if(chkd.length>=1){
+		if(e.target.id==='removeHistory'){
+			var chk=true;
+				if(chkd.length>1){
+					chk = confirm("Are you sure you want to delete multiple entries?");
+				}
+				
+			if(chk){
+				del();
+			}
+		}else if(e.target.id==='openLinks'){
+							opn();
+		}else if(e.target.id==='copyLinks'){
+			let cpy='';
+			for (let i=0; i<chkd.length-1; i++) {
+				cpy+=chkd[chkd.length-1].value+'\n';
+			}
+			cpy+=chkd[chkd.length-1].value;		
+	let txt = document.createElement("textarea");
+    txt.style.maxHeight = '0px'
+    document.body.appendChild(txt);
+    txt.value = cpy;
+	txt.select();
+	document.execCommand("copy");
+	elRemover(txt);
+		}	
+							
+				$('button#removeHistory').prop('checked', false).closest('tr.item').hide();
+									
+				items = $("#" + recordType + "Container tr.item input[name='" + recordType + "[]']");
+				
+				if ($('button#removeHistory').is(":checked")) {
+					items.prop('checked', true);
+				}else{
+					items.prop('checked', false);
+				}
+				
+				updateRemoveButton(recordType);
 }
+
     });
 
     $(document).on("click", ".linkTo", function () {
@@ -494,4 +540,3 @@ chrome.history.onVisited.addListener(function(Historyitem){
 });
 
 });
-

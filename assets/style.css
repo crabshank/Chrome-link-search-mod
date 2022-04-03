@@ -200,11 +200,19 @@ section#searchForm{
 /* Style the tab content */
 
 /* others */
-button.action {
+button.left {
     float: left;
+}
+button.right {
+    float: right;
+}
+
+button.action {
+	white-space: break-spaces;
+	min-height: 9ch;
     padding: 8px;
     border: 1px solid red;
-    color: red;
+    color: #ba0000;
     border-radius: 4px;
     margin-bottom: 2px;
     margin-left: 5px;
