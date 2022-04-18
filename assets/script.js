@@ -96,23 +96,54 @@ var constructHistory = function (historyItems) {
         $(".item_table .noData p").text("No history found!");
         $(".item_table .noData").show();
     }else{
+		
+		
+		
 		historyItems.forEach(function (item) {
-
-			var tr = trOriginal.clone();
-			tr.removeClass('core_history_item');
-			tr.addClass('item');
-			tr.find("td.select input[name='history[]']").val(item.url);
-			let ttl=tr.find("p.info_title a.title");
-				ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
-			//tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
-			tr.find("p.info_time span.time_info").text(getVisitTime(item));
-			let full=tr.find("p.info_url a.full_url");
-			full.text(item.url).attr('href', item.url);
-			if((item.title === item.url) || item.title==='' ){
-				full[0].style.display='none';
+			let t0 = document.getElementById("time0");
+			let t1 = document.getElementById("time1");
+			let t2 = document.getElementById("time2");
+			let time_now=Date.now();
+			let time_then=getVisitTime(item);
+			let ms=0;
+			if(t2.selectedIndex==0){
+				ms=t1.valueAsNumber*60000;
+			}else if(t2.selectedIndex==1){
+				ms=t1.valueAsNumber*3600000;
+			}else if(t2.selectedIndex==2){
+				ms=t1.valueAsNumber*86400000;
+			}else if(t2.selectedIndex==3){
+				ms=t1.valueAsNumber*604800000;
 			}
+			let pass=false;
+			if(t0.selectedIndex==0){
+				pass=true;
+			}else if(t0.selectedIndex==1){
+					if(time_now-time_then[0]<=ms){
+						pass=true;
+					}
+			}else if(t0.selectedIndex==2){
+					if(time_now-time_then[0]>=ms){
+						pass=true;
+					}
+			}
+			if(pass){
+				var tr = trOriginal.clone();
+				tr.removeClass('core_history_item');
+				tr.addClass('item');
+				tr.find("td.select input[name='history[]']").val(item.url);
+				let ttl=tr.find("p.info_title a.title");
+					ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
+				//tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
+				tr.find("p.info_time span.time_info").text(time_then[1]);
+				let full=tr.find("p.info_url a.full_url");
+				full.text(item.url).attr('href', item.url);
+				if((item.title === item.url) || item.title==='' ){
+					full[0].style.display='none';
+				}
 
-			historyTable.append(tr);
+				historyTable.append(tr);
+			}
 		});
 	}
 }
@@ -134,7 +165,7 @@ function updHistChk(){
 		updateRemoveButton(recordType);
 }
 
-	function attachCheckEvts(){
+function attachCheckEvts(){
 		    let checkboxs = document.getElementById("checkboxes");
 	    let lbls=[...checkboxs.getElementsByTagName('label')];
 		
@@ -293,7 +324,7 @@ var getVisitTime = function (item) {
     var options = {weekday: 'long', day: '2-digit', month: 'long', hour: '2-digit', minute: 'numeric'};
     var time = new Date(item.lastVisitTime);
 
-    return time.toLocaleTimeString("en-GB", options);
+    return [item.lastVisitTime,time.toLocaleTimeString("en-GB", options)];
 
 }
 
@@ -333,6 +364,72 @@ overDivd.defTop=overDivd.top;
 $('hr#divider')[0].style.setProperty( 'display','none');
 var checkboxes = document.getElementById("checkboxes");
 var selBox = document.getElementById("selectBox");
+
+let t0 = document.getElementById("time0");
+let t1 = document.getElementById("time1");
+let t2 = document.getElementById("time2");
+
+t2.selectedIndex=3;
+
+t1.style.display='none';
+t2.style.display='none';
+
+function title_search(){
+		 let text =  $("#searchTerm")[0].value;
+		if(text!==''){
+			searchHistory([text],false,true,true,false);
+		}else{
+			  searchHistory([''],false,false,true,false);
+		}
+}
+
+t0.oninput=()=>{
+	if(t0.selectedIndex==0){
+		t1.style.display='none';
+		t2.style.display='none';
+	}else{
+		t1.style.display='initial';
+		t2.style.display='initial';
+	}
+	title_search();
+}
+	
+	
+t1.oninput=()=>{
+		if(t1.valueAsNumber==1){
+		t2.children[0].innerText="minute ago";
+		t2.children[1].innerText="hour ago";
+		t2.children[2].innerText="day ago";
+		t2.children[3].innerText="week ago";
+	}else{
+		t2.children[0].innerText="minutes ago";
+		t2.children[1].innerText="hours ago";
+		t2.children[2].innerText="days ago";
+		t2.children[3].innerText="weeks ago";
+	}
+	title_search();
+}
+
+t1.onwheel=(evt)=>{
+	evt.preventDefault();
+	evt.stopPropagation();
+	let mn=parseInt(t1.min);
+		if(evt.deltaY>0){
+			let n=(Number.isNaN(t1.valueAsNumber))?1:t1.valueAsNumber-1;
+			t1.value=(n<mn)?mn:n;
+			t1.dispatchEvent(new Event('input'));
+		}
+		if (evt.deltaY<0){
+			let n=(Number.isNaN(t1.valueAsNumber))?1:t1.valueAsNumber+1;
+			t1.value=(n<mn)?mn:n;
+			t1.dispatchEvent(new Event('input'));
+		}
+}
+
+t2.oninput=()=>{
+	title_search();
+}
+
 selBox.addEventListener('click',showCheckboxes);
 function showCheckboxes() {
   if (!expanded) {
@@ -349,13 +446,7 @@ function showCheckboxes() {
 }
 
     $("#searchTerm").on("input", function (event) {
-       // resetRemoveCheckBoxes('history');
-        var text = this.value;
-		if(text!==''){
-			searchHistory([text],false,true,true,false);
-		}else{
-			  searchHistory([''],false,false,true,false);
-		}
+			title_search();
     });
 	
 	$('button#clearTerm').on("mouseup", function (e) {
