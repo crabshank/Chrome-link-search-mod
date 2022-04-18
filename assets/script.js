@@ -413,7 +413,7 @@ t1.oninput=()=>{
 t1.onwheel=(evt)=>{
 	evt.preventDefault();
 	evt.stopPropagation();
-	let mn=parseInt(t1.min);
+	let mn=parseFloat(t1.min);
 		if(evt.deltaY>0){
 			let n=(Number.isNaN(t1.valueAsNumber))?1:t1.valueAsNumber-1;
 			t1.value=(n<mn)?mn:n;
