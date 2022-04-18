@@ -20,8 +20,6 @@ function elRemover(el){
 	}
 }
 
-var to_discard=[];
-	
 var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) {
 	if((clear && !reGatherChecked) || startUp){
 		 buildNavigationOptions();
@@ -94,12 +92,11 @@ var constructHistory = function (historyItems) {
     var trOriginal = $("#coreItemTable .core_history_item");
     $(".item_table .noData").hide();
     historyTable.find(".item").remove();
-
     if (historyItems.length == 0) {
         $(".item_table .noData p").text("No history found!");
         $(".item_table .noData").show();
     }else{
-			historyItems.forEach(function (item) {
+		historyItems.forEach(function (item) {
 
 			var tr = trOriginal.clone();
 			tr.removeClass('core_history_item');
@@ -408,7 +405,7 @@ function showCheckboxes() {
 						}
 				}
 				
-				async function opn(discard) {
+				async function opn() {
 					if(chkd.length>0){
 								await new Promise(function(resolve, reject) {
 									var count=0;
@@ -417,9 +414,6 @@ function showCheckboxes() {
 												url: chkd[i].value,
 												active: false		
 											}, function(tab){
-												if(discard){
-													to_discard.push([tab.id,chkd[i].value]);
-												}
 												count++;
 												if(count==chkd.length){
 													resolve();
@@ -441,9 +435,7 @@ if(chkd.length>=1){
 				del();
 			}
 		}else if(e.target.id==='openLinks'){
-							opn(false);
-		}else if(e.target.id==='openLinksDiscard'){
-							opn(true);
+							opn();
 		}else if(e.target.id==='copyLinks'){
 			let cpy='';
 			if(chkd.length>1){
@@ -475,24 +467,6 @@ if(chkd.length>=1){
 }
 
     });
-
-function discardTab(id){
-				chrome.tabs.discard(id, function(tab){
-						console.log('Tab '+tab.id+' discarded.');
-					});
-}
-
-function handleDiscard(id,url){
-	let chk=to_discard.filter((t)=>{return t[0]==id && t[1]==url;});
-	if(chk.length>0){
-		discardTab(id);
-		to_discard=to_discard.filter((t)=>{return !(t[0]==id && t[1]==url);});
-	}
-}
-
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, changedTab) {
-	handleDiscard(tabId,changeInfo.url);
-});
 
     $(document).on("click", ".linkTo", function () {
         $(this).attr('href');
