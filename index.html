@@ -20,17 +20,29 @@
 					<section id="textFilt">
 						<input type="text" autocomplete="off" id="searchTerm" name="searchTerm" placeholder="Search history (includes domain filtering)"><button id="clearTerm">Clear</button>
 					</section>
+						<section id="multiselect_time">
 						<div id="multiselect">
 								<div id="selectBox">Select domains</div>
-							<div id="checkboxes">
-							</div>
+								<div id="checkboxes"></div>
 						</div>
+						<section id="time_sel" style="display: inline-flex; align-items: baseline; align: baseline;">
+					<select id="time0">
+                        <option>All time</option>
+                        <option>Sooner than</option>
+                        <option>Earlier than</option>
+                </select>				
+				<input id="time1" type="number"  value="2" min="0" style="width: 6ch; text-align: left;"></input>
+				<select id="time2">
+                        <option>minutes ago</option>
+                        <option>hours ago</option>
+                        <option>days ago</option>
+                        <option>weeks ago</option>
+                </select>				
 						<hr id="divider">
+			</section>
+			</section>
 				</section>
-				
-			</div>
-			
-			
+
 			<table class="item_table">
 			
 				<thead>
@@ -40,6 +52,7 @@
 						</th>
 						<th style="display: flex;align-items: center;">
 							<span class="th-nav"><button id="removeHistory" class="action left">Remove history records</button></span>
+							<span class="th-nav"><button id="openLinksDiscard" class="action right">Open all selected links (immediately discard)</button></span>
 							<span class="th-nav"><button id="openLinks" class="action right">Open all selected links</button></span>
 							<span class="th-nav"><button id="copyLinks" class="action right">Copy all selected links to clipboard</button></span>
 							<span class="th-nav th-manage"> <a class="linkTo" href="chrome://history/">Manage History</a></span>
@@ -69,7 +82,7 @@
 							<a class="title" target="_blank" href=""></a>
 						</p>
 						<p class="info_time">
-							<span class="icon time" style=""></span> Last Visit Time on :
+							Last Visit Time on :
 							<span class="time_info"></span>
 						</p>
 						<p class="info_url">
