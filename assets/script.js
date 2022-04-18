@@ -20,6 +20,8 @@ function elRemover(el){
 	}
 }
 
+var to_discard=[];
+	
 var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) {
 	if((clear && !reGatherChecked) || startUp){
 		 buildNavigationOptions();
@@ -93,28 +95,29 @@ var constructHistory = function (historyItems) {
     $(".item_table .noData").hide();
     historyTable.find(".item").remove();
 
-    historyItems.forEach(function (item) {
-
-        var tr = trOriginal.clone();
-        tr.removeClass('core_history_item');
-        tr.addClass('item');
-        tr.find("td.select input[name='history[]']").val(item.url);
-        let ttl=tr.find("p.info_title a.title");
-            ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
-        //tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
-        tr.find("p.info_time span.time_info").text(getVisitTime(item));
-        let full=tr.find("p.info_url a.full_url");
-		full.text(item.url).attr('href', item.url);
-		if((item.title === item.url) || item.title==='' ){
-			full[0].style.display='none';
-		}
-
-        historyTable.append(tr);
-    });
     if (historyItems.length == 0) {
         $(".item_table .noData p").text("No history found!");
         $(".item_table .noData").show();
-    }
+    }else{
+			historyItems.forEach(function (item) {
+
+			var tr = trOriginal.clone();
+			tr.removeClass('core_history_item');
+			tr.addClass('item');
+			tr.find("td.select input[name='history[]']").val(item.url);
+			let ttl=tr.find("p.info_title a.title");
+				ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
+			//tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
+			tr.find("p.info_time span.time_info").text(getVisitTime(item));
+			let full=tr.find("p.info_url a.full_url");
+			full.text(item.url).attr('href', item.url);
+			if((item.title === item.url) || item.title==='' ){
+				full[0].style.display='none';
+			}
+
+			historyTable.append(tr);
+		});
+	}
 }
 
 var buildNavigationOptions = function () {
@@ -297,20 +300,6 @@ var getVisitTime = function (item) {
 
 }
 
-/*
-var getFolders = function (paths, arr) {
-
-    if (paths.id != 0) {
-        getFolders(paths.path, arr);
-    }
-    if (paths.id != 0) {
-        arr.push(paths.title);
-    }
-
-    return arr;
-}
-*/
-
 var resetRemoveCheckBoxes = function (recordType) {
     $("#" + recordType + "Container tr input[type='checkbox']").prop('checked', false);
     updateRemoveButton(recordType);
@@ -419,7 +408,7 @@ function showCheckboxes() {
 						}
 				}
 				
-				async function opn() {
+				async function opn(discard) {
 					if(chkd.length>0){
 								await new Promise(function(resolve, reject) {
 									var count=0;
@@ -428,6 +417,9 @@ function showCheckboxes() {
 												url: chkd[i].value,
 												active: false		
 											}, function(tab){
+												if(discard){
+													to_discard.push([tab.id,chkd[i].value]);
+												}
 												count++;
 												if(count==chkd.length){
 													resolve();
@@ -449,7 +441,9 @@ if(chkd.length>=1){
 				del();
 			}
 		}else if(e.target.id==='openLinks'){
-							opn();
+							opn(false);
+		}else if(e.target.id==='openLinksDiscard'){
+							opn(true);
 		}else if(e.target.id==='copyLinks'){
 			let cpy='';
 			if(chkd.length>1){
@@ -481,6 +475,24 @@ if(chkd.length>=1){
 }
 
     });
+
+function discardTab(id){
+				chrome.tabs.discard(id, function(tab){
+						console.log('Tab '+tab.id+' discarded.');
+					});
+}
+
+function handleDiscard(id,url){
+	let chk=to_discard.filter((t)=>{return t[0]==id && t[1]==url;});
+	if(chk.length>0){
+		discardTab(id);
+		to_discard=to_discard.filter((t)=>{return !(t[0]==id && t[1]==url);});
+	}
+}
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, changedTab) {
+	handleDiscard(tabId,changeInfo.url);
+});
 
     $(document).on("click", ".linkTo", function () {
         $(this).attr('href');
