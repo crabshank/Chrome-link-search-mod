@@ -216,7 +216,7 @@ var constructNavigationOptions = function (historyItems) {
         months.push(item);
     });
 
-    var unique = Array.from(new Set(hostnames));
+    var unique = Array.from(new Set(hostnames)).filter((h)=>{return typeof h!=='undefined';});
 	
 	let nw_unique=[];
 			    
@@ -565,7 +565,7 @@ if(chkd.length>=1){
     });   
 
 	$(document).on("click", "a", function (e) {
-        e.preventDefault();	
+        e.preventDefault();
 		chrome.tabs.create({'url': $(this).attr('href')});
     });
 	
