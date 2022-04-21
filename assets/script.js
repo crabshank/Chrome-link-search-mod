@@ -387,14 +387,18 @@ t2.selectedIndex=3;
 t1.style.display='none';
 t2.style.display='none';
 
-function title_search(){
-	 buildNavigationOptions();
-		 let text =  $("#searchTerm")[0].value;
+
+function textSearch(){
+			 let text =  $("#searchTerm")[0].value;
 		if(text!==''){
 			searchHistory([text],false,true,true,false);
 		}else{
 			  searchHistory([''],false,false,true,false);
 		}
+}
+function title_search(){
+			textSearch();
+			 buildNavigationOptions();
 }
 
 t0.oninput=()=>{
@@ -460,7 +464,7 @@ function showCheckboxes() {
 }
 
     $("#searchTerm").on("input", function (event) {
-			title_search();
+			textSearch();
     });
 	
 	$('button#clearTerm').on("mouseup", function (e) {
