@@ -87,6 +87,44 @@ var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) 
 
 }
 
+function timeFilter(historyItems){
+	let filt=[];			
+	let t0 = document.getElementById("time0");
+	let t1 = document.getElementById("time1");
+	let t2 = document.getElementById("time2");
+	let time_now=Date.now();
+	
+			historyItems.forEach(function (item) {
+				let time_then=getVisitTime(item);
+				let ms=0;
+				if(t2.selectedIndex==0){
+					ms=t1.valueAsNumber*60000;
+				}else if(t2.selectedIndex==1){
+					ms=t1.valueAsNumber*3600000;
+				}else if(t2.selectedIndex==2){
+					ms=t1.valueAsNumber*86400000;
+				}else if(t2.selectedIndex==3){
+					ms=t1.valueAsNumber*604800000;
+				}
+				let pass=false;
+				if(t0.selectedIndex==0){
+					pass=true;
+				}else if(t0.selectedIndex==1){
+						if(time_now-time_then[0]<=ms){
+							pass=true;
+						}
+				}else if(t0.selectedIndex==2){
+						if(time_now-time_then[0]>=ms){
+							pass=true;
+						}
+				}
+				if(pass){
+					filt.push([item,time_then]);
+				}
+			});
+	return filt;
+}
+
 var constructHistory = function (historyItems) {
     var historyTable = $("#historyContainer .item_table");
     var trOriginal = $("#coreItemTable .core_history_item");
@@ -96,38 +134,11 @@ var constructHistory = function (historyItems) {
         $(".item_table .noData p").text("No history found!");
         $(".item_table .noData").show();
     }else{
+
+		historyItemsThen=timeFilter(historyItems);
+		historyItems=historyItemsThen.map((h)=>{return h[0];});
 		
-		
-		
-		historyItems.forEach(function (item) {
-			let t0 = document.getElementById("time0");
-			let t1 = document.getElementById("time1");
-			let t2 = document.getElementById("time2");
-			let time_now=Date.now();
-			let time_then=getVisitTime(item);
-			let ms=0;
-			if(t2.selectedIndex==0){
-				ms=t1.valueAsNumber*60000;
-			}else if(t2.selectedIndex==1){
-				ms=t1.valueAsNumber*3600000;
-			}else if(t2.selectedIndex==2){
-				ms=t1.valueAsNumber*86400000;
-			}else if(t2.selectedIndex==3){
-				ms=t1.valueAsNumber*604800000;
-			}
-			let pass=false;
-			if(t0.selectedIndex==0){
-				pass=true;
-			}else if(t0.selectedIndex==1){
-					if(time_now-time_then[0]<=ms){
-						pass=true;
-					}
-			}else if(t0.selectedIndex==2){
-					if(time_now-time_then[0]>=ms){
-						pass=true;
-					}
-			}
-			if(pass){
+		historyItems.forEach(function (item,index) {
 				var tr = trOriginal.clone();
 				tr.removeClass('core_history_item');
 				tr.addClass('item');
@@ -135,15 +146,13 @@ var constructHistory = function (historyItems) {
 				let ttl=tr.find("p.info_title a.title");
 					ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
 				//tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
-				tr.find("p.info_time span.time_info").text(time_then[1]);
+				tr.find("p.info_time span.time_info").text(historyItemsThen[index][1][1]);
 				let full=tr.find("p.info_url a.full_url");
 				full.text(item.url).attr('href', item.url);
 				if((item.title === item.url) || item.title==='' ){
 					full[0].style.display='none';
 				}
-
 				historyTable.append(tr);
-			}
 		});
 	}
 }
@@ -209,6 +218,10 @@ var constructNavigationOptions = function (historyItems) {
     var checkboxs = document.getElementById("checkboxes");
     var hostnames = [];
     var months = [];
+	
+	historyItemsThen=timeFilter(historyItems);
+	historyItems=historyItemsThen.map((h)=>{return h[0];});
+	
     historyItems.forEach(function (item) {
 		let spl3=item.url.split('///')
 		let hst=(spl3.length>1)?spl3[0]:item.url.split('/')[2];
@@ -375,6 +388,7 @@ t1.style.display='none';
 t2.style.display='none';
 
 function title_search(){
+	 buildNavigationOptions();
 		 let text =  $("#searchTerm")[0].value;
 		if(text!==''){
 			searchHistory([text],false,true,true,false);
