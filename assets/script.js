@@ -87,24 +87,54 @@ var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) 
 
 }
 
+function getAdjCurrDateTimeOffset(outISO,ignoreTimeZones,offst){
+	offst=(typeof offst==='undefined')?0:offst;
+	let now = new Date();
+    let tz_offset = (typeof ignoreTimeZones==='undefined' || !ignoreTimeZones)?now.getTimezoneOffset() * 60000:0	;
+	let t=now.getTime()- tz_offset + offst;
+	if(outISO){
+		return new Date(t).toISOString();
+	}else{
+		return t;
+	}
+}
+
+function getAdjDateTimeOffset(thenTime, outISO,ignoreTimeZones,offst){
+	offst=(typeof offst==='undefined')?0:offst;
+	let now = new Date();
+    let tz_offset = (typeof ignoreTimeZones==='undefined' || !ignoreTimeZones)?now.getTimezoneOffset() * 60000:0	;
+	let t=thenTime+ tz_offset + offst;
+	if(outISO){
+		return new Date(t).toISOString();
+	}else{
+		return t;
+	}
+}
+
 function timeFilter(historyItems){
 	let filt=[];			
 	let t0 = document.getElementById("time0");
 	let t1 = document.getElementById("time1");
 	let t2 = document.getElementById("time2");
-	let time_now=Date.now();
-	
-			historyItems.forEach(function (item) {
+	let t3 = document.getElementById("time3");
+	let dt=(t0.selectedIndex>=3)?true:false;
+	let time_now=getAdjCurrDateTimeOffset(false,(dt)?false:true);
+
+			historyItems.forEach(function (item){
 				let time_then=getVisitTime(item);
 				let ms=0;
-				if(t2.selectedIndex==0){
-					ms=t1.valueAsNumber*60000;
-				}else if(t2.selectedIndex==1){
-					ms=t1.valueAsNumber*3600000;
-				}else if(t2.selectedIndex==2){
-					ms=t1.valueAsNumber*86400000;
-				}else if(t2.selectedIndex==3){
-					ms=t1.valueAsNumber*604800000;
+				if(dt){
+					ms=getAdjDateTimeOffset(t3.valueAsNumber,false);
+				}else{
+					if(t2.selectedIndex==0){
+						ms=t1.valueAsNumber*60000;
+					}else if(t2.selectedIndex==1){
+						ms=t1.valueAsNumber*3600000;
+					}else if(t2.selectedIndex==2){
+						ms=t1.valueAsNumber*86400000;
+					}else if(t2.selectedIndex==3){
+						ms=t1.valueAsNumber*604800000;
+					}
 				}
 				let pass=false;
 				if(t0.selectedIndex==0){
@@ -113,8 +143,16 @@ function timeFilter(historyItems){
 						if(time_now-time_then[0]<=ms){
 							pass=true;
 						}
+				}else if(t0.selectedIndex==4){
+						if(time_then[0]<=ms){
+							pass=true;
+						}
 				}else if(t0.selectedIndex==2){
 						if(time_now-time_then[0]>=ms){
+							pass=true;
+						}
+				}else if(t0.selectedIndex==3){
+						if(time_then[0]	>=ms){
 							pass=true;
 						}
 				}
@@ -334,11 +372,9 @@ attachCheckEvts();
 }
 
 var getVisitTime = function (item) {
-    var options = {weekday: 'long', day: '2-digit', month: 'long', hour: '2-digit', minute: 'numeric'};
-    var time = new Date(item.lastVisitTime);
-
-    return [item.lastVisitTime,time.toLocaleTimeString("en-GB", options)];
-
+    let options = {weekday: 'long', day: '2-digit', month: 'long', hour: '2-digit', minute: 'numeric'};
+	let t=item.lastVisitTime;
+    return [t, new Date(t).toLocaleTimeString("en-GB", options)];
 }
 
 var resetRemoveCheckBoxes = function (recordType) {
@@ -381,12 +417,16 @@ var selBox = document.getElementById("selectBox");
 let t0 = document.getElementById("time0");
 let t1 = document.getElementById("time1");
 let t2 = document.getElementById("time2");
+let t3 = document.getElementById("time3");
+
+t3.value=getAdjCurrDateTimeOffset(true,true,1209600000).split('T')[0]+'T00:00:00';
+t3.max=getAdjCurrDateTimeOffset(true).split('T')[0]+'T23:59:59.999';
 
 t2.selectedIndex=3;
 
 t1.style.display='none';
 t2.style.display='none';
-
+t3.style.display='none';
 
 function textSearch(){
 			 let text =  $("#searchTerm")[0].value;
@@ -405,9 +445,15 @@ t0.oninput=()=>{
 	if(t0.selectedIndex==0){
 		t1.style.display='none';
 		t2.style.display='none';
-	}else{
+		t3.style.display='none';
+	}else if(t0.selectedIndex<=2){
 		t1.style.display='initial';
 		t2.style.display='initial';
+		t3.style.display='none';
+	}else{
+		t1.style.display='none';
+		t2.style.display='none';
+		t3.style.display='initial';
 	}
 	title_search();
 }
@@ -445,6 +491,10 @@ t1.onwheel=(evt)=>{
 }
 
 t2.oninput=()=>{
+	title_search();
+}
+
+t3.oninput=()=>{
 	title_search();
 }
 
