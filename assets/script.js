@@ -419,7 +419,7 @@ let t1 = document.getElementById("time1");
 let t2 = document.getElementById("time2");
 let t3 = document.getElementById("time3");
 
-t3.value=getAdjCurrDateTimeOffset(true,true,1209600000).split('T')[0]+'T00:00:00';
+t3.value=getAdjCurrDateTimeOffset(true,true,-1209600000).split('T')[0]+'T00:00:00';
 t3.max=getAdjCurrDateTimeOffset(true).split('T')[0]+'T23:59:59.999';
 
 t2.selectedIndex=3;
