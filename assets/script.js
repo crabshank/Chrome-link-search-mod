@@ -590,15 +590,23 @@ function showCheckboxes() {
 								await new Promise(function(resolve, reject) {
 									var count=0;
 									for (let i=0; i<chkd.length; i++) {
+										let addr=chkd[i].value;
+										try{
 											chrome.tabs.create({
-												url: chkd[i].value,
+												url: addr,
 												active: false		
 											}, function(tab){
+													count++;
+													if(count==chkd.length){
+														resolve();
+													}
+											});
+										}catch(e){
 												count++;
 												if(count==chkd.length){
 													resolve();
 												}
-											});
+										}
 									}
 							}).then((result) => {;}).catch((result) => {;});
 						}
