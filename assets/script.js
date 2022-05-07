@@ -1,3 +1,5 @@
+var suppressHistRem=false;
+
 function retain_spl_arr(s,c){
 var sa= s.split(c);
 for (let i= sa.length; i-->1;){
@@ -559,17 +561,27 @@ function showCheckboxes() {
 							if(chkd.length>0){
 								await new Promise(function(resolve, reject) {
 									var count=0;
-									for (let i=0; i<chkd.length; i++) {
+									suppressHistRem=true;
+									for (let i=0; i<chkd.length; i++) {	
+										try{
 											chrome.history.deleteUrl({
 												url: chkd[i].value
 											}, function(){
 												count++;
 												if(count==chkd.length){
-												resolve();
+													suppressHistRem=false;
+													resolve();
 												}
 											});
+										}catch(e){
+											count++;
+											if(count==chkd.length){
+												suppressHistRem=false;
+												resolve();
+											}
+										}
 									}
-							}).then((result) => {;}).catch((result) => {;});
+							}).then((result) => {onHistRem();}).catch((result) => {;});
 						}
 				}
 				
@@ -683,10 +695,16 @@ if(chkd.length>=1){
        overDivd.over=(overDivd.over)?false:overDivd.over;
     });
 	
+	function onHistRem(){
+		if(!suppressHistRem){
+			$("#searchTerm")[0].value='';
+			$("input#allHistories")[0].checked=false;
+			searchHistory([''],true,false,true,true);
+		}
+	}
+	
 chrome.history.onVisitRemoved.addListener(function(removed){
-					$("#searchTerm")[0].value='';
-					$("input#allHistories")[0].checked=false;
-	searchHistory([''],true,false,true,true);
+	onHistRem();
 });
 	
 chrome.history.onVisited.addListener(function(Historyitem){
