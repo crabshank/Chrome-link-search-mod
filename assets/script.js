@@ -166,8 +166,32 @@ function timeFilter(historyItems){
 }
 
 var constructHistory = function (historyItems) {
+	var hitb=document.createElement('table');
+	hitb.className='coreItemTable';
+	
+	hitb.innerHTML=`<tbody>
+				<tr class="item core_history_item">
+					<td class="select"><input type="checkbox" name="history[]" value=""></td>
+					<td colspan="2" class="info">
+						<p class="info_title">
+							<!-- <span class="icon favicon" style=""></span> -->
+							<a class="title" target="_blank" href=""></a>
+						</p>
+						<p class="info_time">
+							Last Visit Time on :
+							<span class="time_info"></span>
+						</p>
+						<p class="info_url">
+							<span class="icon url"></span>
+							<a class="full_url" target="_blank"
+								href="#"></a>
+						</p>
+					</td>
+				</tr>
+			</tbody>`;
+		
     var historyTable = $("#historyContainer .item_table");
-    var trOriginal = $("#coreItemTable .core_history_item");
+    var trOriginal = $(hitb,".core_history_item");
     $(".item_table .noData").hide();
     historyTable.find(".item").remove();
     if (historyItems.length == 0) {
@@ -181,7 +205,7 @@ var constructHistory = function (historyItems) {
 		historyItems.forEach(function (item,index) {
 				var tr = trOriginal.clone();
 				tr.removeClass('core_history_item');
-				tr.addClass('item');
+				//tr.addClass('item');
 				tr.find("td.select input[name='history[]']").val(item.url);
 				let ttl=tr.find("p.info_title a.title");
 					ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
