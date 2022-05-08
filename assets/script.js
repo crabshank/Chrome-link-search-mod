@@ -166,12 +166,10 @@ function timeFilter(historyItems){
 }
 
 var constructHistory = function (historyItems) {
-	var hitb=document.createElement('table');
-	hitb.className='coreItemTable';
+	var hitb=document.createElement('TR');
+	hitb.className='item core_history_item';
 	
-	hitb.innerHTML=`<tbody>
-				<tr class="item core_history_item">
-					<td class="select"><input type="checkbox" name="history[]" value=""></td>
+	hitb.innerHTML=`<td class="select"><input type="checkbox" name="history[]" value=""></td>
 					<td colspan="2" class="info">
 						<p class="info_title">
 							<!-- <span class="icon favicon" style=""></span> -->
@@ -186,9 +184,7 @@ var constructHistory = function (historyItems) {
 							<a class="full_url" target="_blank"
 								href="#"></a>
 						</p>
-					</td>
-				</tr>
-			</tbody>`;
+					</td>`;
 		
     var historyTable = $("#historyContainer .item_table");
     var trOriginal = $(hitb,".core_history_item");
