@@ -1,4 +1,4 @@
-var suppressHistRem=false;
+var suppressHistRem={b:false,u:[]};
 
 function retain_spl_arr(s,c){
 var sa= s.split(c);
@@ -441,16 +441,27 @@ let t1 = document.getElementById("time1");
 let t2 = document.getElementById("time2");
 let t3 = document.getElementById("time3");
 
-t3.value=getAdjCurrDateTimeOffset(true,true,-1209600000).split('T')[0]+'T00:00:00';
+t3.value=getAdjCurrDateTimeOffset(true).split('T')[0]+'T23:59';
+t3.valueAsNumber+=59999;
+t3.max=t3.valueAsNumber;
 
-t3.max=getAdjCurrDateTimeOffset(true).split('T')[0]+'T23:59:59.999';
+t3.value=getAdjCurrDateTimeOffset(true,true,-1209600000).split('Z')[0].split('T')[0]+'T00:00';
+
+function upd_ptr(event){
+	let t3AsN=t3.valueAsNumber;
+	t3.value=getAdjCurrDateTimeOffset(true).split('T')[0]+'T23:59';
+	t3.valueAsNumber+=59999;
+	t3.max=t3.valueAsNumber;
+
+	t3.valueAsNumber=t3AsN;
+}
 
 t3.onpointerenter=(event)=>{
-	t3.max=getAdjCurrDateTimeOffset(true).split('T')[0]+'T23:59:59.999';
+	upd_ptr(event);
 }
 
 t3.onpointerleave=(event)=>{
-	t3.max=getAdjCurrDateTimeOffset(true).split('T')[0]+'T23:59:59.999';
+	upd_ptr(event);
 }
 
 t2.selectedIndex=3;
@@ -577,31 +588,55 @@ function showCheckboxes() {
 
         let chkd=items.filter(':checked');
 		
+		function postBtn_act(){
+					$('button#removeHistory').prop('checked', false).closest('tr.item').hide();
+									
+				items = $("#" + recordType + "Container tr.item input[name='" + recordType + "[]']");
+				
+				if ($('button#removeHistory').is(":checked")) {
+					items.prop('checked', true);
+				}else{
+					items.prop('checked', false);
+				}
+				
+				updateRemoveButton(recordType);
+}
 					async function del() {
 							if(chkd.length>0){
 								await new Promise(function(resolve, reject) {
+									let rmb=$('button#removeHistory')[0];
+									rmb.classList.add('del_info');
 									var count=0;
-									suppressHistRem=true;
+									suppressHistRem.b=true;
 									for (let i=0; i<chkd.length; i++) {	
+										suppressHistRem.u.push( chkd[i].value);
 										try{
 											chrome.history.deleteUrl({
 												url: chkd[i].value
 											}, function(){
 												count++;
 												if(count==chkd.length){
-													suppressHistRem=false;
+													suppressHistRem.b=false;
+													rmb.classList.remove('del_info');
+													rmb.innerHTML="Remove history records";
 													resolve();
+												}else{
+													rmb.innerHTML=count+"/"+chkd.length+" history records removed";
 												}
 											});
 										}catch(e){
 											count++;
 											if(count==chkd.length){
-												suppressHistRem=false;
+												suppressHistRem.b=false;
+												rmb.classList.remove('del_info');
+												rmb.innerHTML="Remove history records";
 												resolve();
+											}else{
+												rmb.innerHTML=count+"/"+chkd.length+" history records removed";
 											}
 										}
 									}
-							}).then((result) => {onHistRem();}).catch((result) => {;});
+							}).then((result) => {postBtn_act();}).then((result) => {onHistRem();}).catch((result) => {;});
 						}
 				}
 				
@@ -628,22 +663,26 @@ function showCheckboxes() {
 												}
 										}
 									}
-							}).then((result) => {;}).catch((result) => {;});
+							}).then((result) => {postBtn_act();}).catch((result) => {;});
 						}
 				}
 
+
+
 if(chkd.length>=1){
-		if(e.target.id==='removeHistory'){
+		if(e.target.id==='removeHistory' && !e.target.classList.contains('del_info')){
 			var chk=true;
-				if(chkd.length>1){
-					chk = confirm("Are you sure you want to delete multiple entries?");
-				}
-				
+			if(chkd.length!=1){
+				chk = confirm("Are you sure you want to delete multiple entries?");
+			}
+
 			if(chk){
 				del();
+			}else{
+				postBtn_act();
 			}
 		}else if(e.target.id==='openLinks'){
-							opn();
+			opn();
 		}else if(e.target.id==='copyLinks'){
 			let cpy='';
 			if(chkd.length>1){
@@ -652,26 +691,19 @@ if(chkd.length>=1){
 				}
 			}
 			cpy+=chkd[chkd.length-1].value;		
-	let txt = document.createElement("textarea");
-    txt.style.maxHeight = '0px'
-    document.body.appendChild(txt);
-    txt.value = cpy;
-	txt.select();
-	document.execCommand("copy");
-	elRemover(txt);
-		}	
+			let txt = document.createElement("textarea");
+			txt.style.maxHeight = '0px'
+			document.body.appendChild(txt);
+			txt.value = cpy;
+			txt.select();
+			document.execCommand("copy");
+			elRemover(txt);
+			postBtn_act();
+	}else{
+			postBtn_act();
+	}
 							
-				$('button#removeHistory').prop('checked', false).closest('tr.item').hide();
-									
-				items = $("#" + recordType + "Container tr.item input[name='" + recordType + "[]']");
-				
-				if ($('button#removeHistory').is(":checked")) {
-					items.prop('checked', true);
-				}else{
-					items.prop('checked', false);
-				}
-				
-				updateRemoveButton(recordType);
+
 }
 
     });
@@ -724,7 +756,7 @@ if(chkd.length>=1){
     });
 	
 	function onHistRem(){
-		if(!suppressHistRem){
+		if(!suppressHistRem.b){
 			$("#searchTerm")[0].value='';
 			$("input#allHistories")[0].checked=false;
 			searchHistory([''],true,false,true,true);
@@ -732,7 +764,13 @@ if(chkd.length>=1){
 	}
 	
 chrome.history.onVisitRemoved.addListener(function(removed){
-	onHistRem();
+		for(let i=removed.urls.length-1; i>=0; i--){
+			if(suppressHistRem.u.includes(removed.urls[i]) ){
+				suppressHistRem.u=suppressHistRem.u.filter((l)=>{return l!==removed.urls[i]});
+			}else{
+				onHistRem();
+			}
+		}
 });
 	
 chrome.history.onVisited.addListener(function(Historyitem){
