@@ -1,4 +1,9 @@
 var suppressHistRem={b:false,u:[]};
+var tbs=[];
+
+function getUrl(tab) {
+	return (tab.url == "" && !!tab.pendingUrl && typeof tab.pendingUrl !== 'undefined' && tab.pendingUrl != '') ? tab.pendingUrl : tab.url;
+}
 
 function retain_spl_arr(s,c){
 var sa= s.split(c);
@@ -20,6 +25,14 @@ function elRemover(el){
 		el.parentNode.removeChild(el);
 	}
 	}
+}
+
+async function tabs_discard(d){
+	await new Promise(function(resolve, reject) {
+				chrome.tabs.discard(d, function(tab){
+						resolve();
+				});
+	});
 }
 
 var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) {
@@ -640,7 +653,7 @@ function showCheckboxes() {
 						}
 				}
 				
-				async function opn() {
+				async function opn(disc) {
 					if(chkd.length>0){
 								await new Promise(function(resolve, reject) {
 									var count=0;
@@ -652,6 +665,9 @@ function showCheckboxes() {
 												active: false		
 											}, function(tab){
 													count++;
+													if(disc){
+														tbs.push({id: tab.id});
+													}
 													if(count==chkd.length){
 														resolve();
 													}
@@ -682,7 +698,9 @@ if(chkd.length>=1){
 				postBtn_act();
 			}
 		}else if(e.target.id==='openLinks'){
-			opn();
+			opn(false);
+		}else if(e.target.id==='openLinksDisc'){
+			opn(true);
 		}else if(e.target.id==='copyLinks'){
 			let cpy='';
 			if(chkd.length>1){
@@ -763,6 +781,44 @@ if(chkd.length>=1){
 		}
 	}
 	
+
+
+	
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+	if(changeInfo.url){
+		let ix=tbs.findIndex((t)=>{return t.id===tabId;}); if(ix>=0){
+			tabs_discard(tabId);
+			tbs=tbs.filter((t)=>{return t.id!==tabId;});
+		}
+	}
+});
+
+chrome.tabs.onCreated.addListener((tab)=>{
+				let du=getUrl(tab);
+				let vu=(!!du && typeof du!=="undefined" && du!=="")?true:false;
+				let ix=tbs.findIndex((t)=>{return t.id===tab.id;}); 
+				
+			if( vu &&  ix>=0 && !du.startsWith('about:')){
+					tabs_discard(tab.id);
+					tbs=tbs.filter((t)=>{return t.id!==tab.id;});
+			}
+			
+});
+	
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo){
+	tbs=tbs.filter((t)=>{return t.id!==tabId;});
+});
+
+function replaceTabs(r,a){
+	let ix=tbs.findIndex((t)=>{return t.id===r;}); if(ix>=0){
+		tbs[ix].id=a;
+	}
+}
+
+chrome.tabs.onReplaced.addListener(function(addedTabId, removedTabId) {
+	replaceTabs(removedTabId,addedTabId);
+});
+
 chrome.history.onVisitRemoved.addListener(function(removed){
 		for(let i=removed.urls.length-1; i>=0; i--){
 			if(suppressHistRem.u.includes(removed.urls[i]) ){
