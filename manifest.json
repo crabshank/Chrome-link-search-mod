@@ -1,6 +1,4 @@
 {
-"update_url": "https://clients2.google.com/service/update2/crx",
-
   "name": "Chrome link search",
   "short_name": "Link search",
   "description": "Easily search your browser history, bookmark, tab in all windows and useful chrome options links",
