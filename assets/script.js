@@ -28,7 +28,7 @@ function elRemover(el){
 }
 
 async function tabs_discard(d){
-	await new Promise(function(resolve, reject) {
+	return new Promise(function(resolve) {
 				chrome.tabs.discard(d, function(tab){
 						resolve();
 				});
@@ -615,8 +615,8 @@ function showCheckboxes() {
 				updateRemoveButton(recordType);
 }
 					async function del() {
+						return new Promise(function(resolve) {
 							if(chkd.length>0){
-								await new Promise(function(resolve, reject) {
 									let rmb=$('button#removeHistory')[0];
 									rmb.classList.add('del_info');
 									var count=0;
@@ -649,13 +649,15 @@ function showCheckboxes() {
 											}
 										}
 									}
-							}).then((result) => {postBtn_act();}).then((result) => {onHistRem();}).catch((result) => {;});
+						}else{
+							resolve();
 						}
+						});
 				}
 				
 				async function opn(disc) {
-					if(chkd.length>0){
-								await new Promise(function(resolve, reject) {
+					return new Promise(function(resolve) {
+						if(chkd.length>0){
 									var count=0;
 									for (let i=0; i<chkd.length; i++) {
 										let addr=chkd[i].value;
@@ -679,8 +681,10 @@ function showCheckboxes() {
 												}
 										}
 									}
-							}).then((result) => {postBtn_act();}).catch((result) => {;});
+						}else{
+							resolve();
 						}
+				});
 				}
 
 
@@ -692,15 +696,26 @@ if(chkd.length>=1){
 				chk = confirm("Are you sure you want to delete multiple entries?");
 			}
 
-			if(chk){
-				del();
+			if(chk){	
+				(async ()=>{ 
+					await del();
+					postBtn_act();
+					onHistRem();
+				})();
 			}else{
 				postBtn_act();
 			}
 		}else if(e.target.id==='openLinks'){
-			opn(false);
+			(async ()=>{ 
+				await opn(false);
+				postBtn_act();
+			})();
+			
 		}else if(e.target.id==='openLinksDisc'){
-			opn(true);
+			(async ()=>{ 
+				await opn(true);
+				postBtn_act();
+			})();	
 		}else if(e.target.id==='copyLinks'){
 			let cpy='';
 			if(chkd.length>1){
@@ -787,7 +802,7 @@ if(chkd.length>=1){
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	if(changeInfo.url){
 		let ix=tbs.findIndex((t)=>{return t.id===tabId;}); if(ix>=0){
-			tabs_discard(tabId);
+			(async ()=>{ await tabs_discard(tabId); })();
 			tbs=tbs.filter((t)=>{return t.id!==tabId;});
 		}
 	}
@@ -799,7 +814,7 @@ chrome.tabs.onCreated.addListener((tab)=>{
 				let ix=tbs.findIndex((t)=>{return t.id===tab.id;}); 
 				
 			if( vu &&  ix>=0 && !du.startsWith('about:')){
-					tabs_discard(tab.id);
+					(async ()=>{ await tabs_discard(tab.id); })();
 					tbs=tbs.filter((t)=>{return t.id!==tab.id;});
 			}
 			
