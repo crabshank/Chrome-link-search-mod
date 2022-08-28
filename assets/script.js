@@ -64,18 +64,20 @@ var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) 
 		
 		for (let i = 0; i < hist.length; i++) {
 			for (let k = 0; k < filterArr.length; k++) {
-				
+				let hl=hist[i].title.toLocaleLowerCase();
+				let hlu=hist[i].url.toLocaleLowerCase();
+				let fl=filterArr[k].toLocaleLowerCase();
 				if(reGatherChecked && tickDmns.length>0){
 					for (let n = 0; n<tickDmns.length; n++) {
 						if(titleToo){
-							if((hist[i].url.toLocaleLowerCase().indexOf(tickDmns[n])>=0) ){
-								if( (hist[i].url.toLocaleLowerCase().indexOf(filterArr[k]) >= 0) || (hist[i].title.toLocaleLowerCase().indexOf(filterArr[k].toLocaleLowerCase()) >= 0) ){
+							if((hlu.indexOf(tickDmns[n])>=0) ){
+								if( (hlu.indexOf(filterArr[k]) >= 0) || (hl.indexOf(fl) >= 0) ){
 									 filtHist.push(hist[i]);
 								}
 							}
 						}else{
-							if((hist[i].url.toLocaleLowerCase().indexOf(tickDmns[n].toLocaleLowerCase())>=0) ){
-								if( hist[i].url.toLocaleLowerCase().indexOf(filterArr[k].toLocaleLowerCase()) >= 0 ){
+							if((hlu.indexOf(tickDmns[n].toLocaleLowerCase())>=0) ){
+								if( hlu.indexOf(fl) >= 0 ){
 									 filtHist.push(hist[i]);
 								}
 							}
@@ -83,17 +85,18 @@ var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) 
 					}
 				}else{
 					if(titleToo){
-						if( (hist[i].url.toLocaleLowerCase().indexOf(filterArr[k].toLocaleLowerCase()) >= 0) || (hist[i].title.toLocaleLowerCase().indexOf(filterArr[k].toLocaleLowerCase()) >= 0) ){
+						if( (hlu.indexOf(fl) >= 0) || (hl.indexOf(fl) >= 0) ){
 						filtHist.push(hist[i]);
 						}
 					}else{
-						if( hist[i].url.toLocaleLowerCase().indexOf(filterArr[k].toLocaleLowerCase()) >= 0 ){
+						if( hlu.indexOf(fl) >= 0 ){
 						filtHist.push(hist[i]);
 						}
 					}					
 				}
 			}
 		}
+		
 		constructHistory(filtHist);
 						updHistChk();
 	}
