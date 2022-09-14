@@ -1,7 +1,7 @@
 {
-  "name": "Chrome link search",
+  "name": "Chrome quick history search",
   "short_name": "Link search",
-  "description": "Easily search your browser history, bookmark, tab in all windows and useful chrome options links",
+  "description": "Easily manage your browser history.",
   "manifest_version": 3,
   "version": "2022.9",
   "offline_enabled": true,
