@@ -12,6 +12,7 @@
 .item_table input[type="checkbox"] {
     margin: 0 9px;
 	transform: scale(1.75);
+	float: right;
 }
 
 .item_table td.select {
