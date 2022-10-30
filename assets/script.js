@@ -192,7 +192,7 @@ var constructHistory = function (historyItems) {
 							<a class="title" target="_blank" href=""></a>
 						</p>
 						<p class="info_time">
-							Last Visit Time on :
+							Last Visit Time on:
 							<span class="time_info"></span>
 						</p>
 						<p class="info_url">
@@ -253,39 +253,45 @@ function updHistChk(){
 function attachCheckEvts(){
 		    let checkboxs = document.getElementById("checkboxes");
 	    let lbls=[...checkboxs.getElementsByTagName('label')];
+		let lblc=lbls.map((l)=>{return [...l.querySelectorAll('input[type="checkbox"]')][0]});
+		let lblcd=lblc.slice(1);
 		
-		for(let i=0; i<lbls.length; i++){
-			
-		let ckb=[...lbls[i].querySelectorAll('input[type="checkbox"]')][0];
+		for(let i=0; i<lblc.length; i++){
+				
+			let ckb=lblc[i];
 
-		if(i==0){
-			ckb.oninput=function(){
-					if(ckb.checked){
-						for(let k=0; k<lbls.length; k++){
-							[...lbls[k].querySelectorAll('input[type="checkbox"]')][0].checked=true;
-						}
-						
-					if( $("#searchTerm")[0].value!==''){
-						searchHistory([ $("#searchTerm")[0].value],false,true,true,false);
-					}else{
-						searchHistory([''],false,false,true,false);
-					}
-								
-					}else{
-						for(let k=0; k<lbls.length; k++){
-							[...lbls[k].querySelectorAll('input[type="checkbox"]')][0].checked=false;
-						}
-					}	
-		}
-		}else{
+			if(i==0){
 				ckb.oninput=function(){
-					if( $("#searchTerm")[0].value!==''){
-						searchHistory([ $("#searchTerm")[0].value],false,true,true,false);
-					}else{
-						searchHistory([''],false,false,true,false);
+						if(ckb.checked){
+							for(let k=0; k<lblc.length; k++){
+								lblcd[k].checked=true;
+							}
+							
+							if( $("#searchTerm")[0].value!==''){
+								searchHistory([ $("#searchTerm")[0].value],false,true,true,false);
+							}else{
+								searchHistory([''],false,false,true,false);
+							}
+										
+						}else{
+							for(let k=0; k<lblc.length; k++){
+								lblcd[k].checked=false;
+							}
+						}	
+			}
+			}else{
+					ckb.oninput=function(){
+						
+						let lc=lblcd.filter((i)=>{return i.checked;});
+						lblc[0].checked=(lblcd.length===lc.length)?true:false;
+						
+						if( $("#searchTerm")[0].value!==''){
+							searchHistory([ $("#searchTerm")[0].value],false,true,true,false);
+						}else{
+							searchHistory([''],false,false,true,false);
+						}
 					}
-				}
-		}
+			}
 		}
 }
 
@@ -581,6 +587,9 @@ function showCheckboxes() {
 	});
 
     $(document).on('input', ".item_table tbody .select input[type='checkbox']", function () {
+		let i=[...document.querySelectorAll(".item_table tbody .select input[type='checkbox']")];
+		let ic=i.filter((i)=>{return i.checked;});
+		$("#allHistories")[0].checked=(i.length===ic.length)?true:false;
         updateRemoveButton(getRecordType(this));
     });
 	
