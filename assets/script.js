@@ -1,5 +1,10 @@
 var suppressHistRem={b:false,u:[]};
 var tbs=[];
+var ts = document.getElementById("time_s");
+var t0 = document.getElementById("time0");
+var t1 = document.getElementById("time1");
+var t2 = document.getElementById("time2");
+var t3 = document.getElementById("time3");
 
 function getUrl(tab) {
 	return (tab.url == "" && !!tab.pendingUrl && typeof tab.pendingUrl !== 'undefined' && tab.pendingUrl != '') ? tab.pendingUrl : tab.url;
@@ -129,56 +134,124 @@ function getAdjDateTimeOffset(thenTime, outISO,ignoreTimeZones,offst){
 	}
 }
 
-function timeFilter(historyItems){
-	let filt=[];			
-	let t0 = document.getElementById("time0");
-	let t1 = document.getElementById("time1");
-	let t2 = document.getElementById("time2");
-	let t3 = document.getElementById("time3");
-	let dt=(t0.selectedIndex>=3)?true:false;
-	let time_now=getAdjCurrDateTimeOffset(false,(dt)?false:true);
 
-			historyItems.forEach(function (item){
-				let time_then=getVisitTime(item);
+function pre_timeFilter(historyItems){
+	var unique= []; //unique hostnames
+    var hostnames_ixs={};
+    historyItems.forEach(function (item,index) {
+		let spl3=item.url.split('///')
+		let hst=(spl3.length>1)?spl3[0]:item.url.split('/')[2];
+		item.domain=hst;
+		if(!unique.includes(hst)){
+			unique.push(hst);
+			hostnames_ixs[hst]=[index];
+		}else{
+			hostnames_ixs[hst].push(index);
+		}
+    });
+	if(ts.selectedIndex===1){			
+		return domainTimeFilter(unique,hostnames_ixs,historyItems);
+	}else{
+		return [historyItems,unique]
+	}
+}
+
+function domainTimeFilter(unique,hostnames_ixs,historyItems){
+	let filtHist=[];
+	let histTimes=[];
+	let out=[[],[],[]];
+	for (let i=0, len_i=unique.length; i<len_i; i++){
+		let ij=hostnames_ixs[unique[i]]; //array of indexes
+		let inLimit=true;
+		for (let j=0, len_j=ij.length; j<len_j; j++){
+			let chk=inTimeLimit(historyItems[ ij[j] ]);
+			histTimes[ ij[j] ]=chk[1];
+			if(chk[0]===false){
+				inLimit=false;
+				j=len_j-1;
+			}
+		}
+		if(inLimit===true){
+			filtHist.push(...ij);
+			out[1].push(unique[i]);
+		}
+	}
+	
+	for (let j=0, len_j=filtHist.length; j<len_j; j++){
+		out[0].push(historyItems[ filtHist[j] ]);
+		out[2].push(histTimes[ filtHist[j] ]);
+	}
+	return out;
+}
+
+function inTimeLimit(i){
+	let t0s=t0.selectedIndex;
+	let t2s=t2.selectedIndex;
+	let dt=(t0s>=3)?true:false;
+	let time_now=getAdjCurrDateTimeOffset(false,(dt)?false:true);
+	let time_mult=60000;
+	
+	if(t2s==1){
+						time_mult=3600000;
+	}else if(t2s==2){
+						time_mult=86400000;
+	}else if(t2s==3){
+						time_mult=604800000;
+	}
+	
+	
+				let time_then=getVisitTime(i);
 				let ms=0;
+				
 				if(dt){
 					ms=getAdjDateTimeOffset(t3.valueAsNumber,false);
 				}else{
-					if(t2.selectedIndex==0){
-						ms=t1.valueAsNumber*60000;
-					}else if(t2.selectedIndex==1){
-						ms=t1.valueAsNumber*3600000;
-					}else if(t2.selectedIndex==2){
-						ms=t1.valueAsNumber*86400000;
-					}else if(t2.selectedIndex==3){
-						ms=t1.valueAsNumber*604800000;
-					}
+						ms=t1.valueAsNumber*time_mult;
 				}
+				
 				let pass=false;
-				if(t0.selectedIndex==0){
+				if(t0s==0){
 					pass=true;
-				}else if(t0.selectedIndex==1){
+				}else if(t0s==1){
 						if(time_now-time_then[0]<=ms){
 							pass=true;
 						}
-				}else if(t0.selectedIndex==4){
+				}else if(t0s==4){
 						if(time_then[0]<=ms){
 							pass=true;
 						}
-				}else if(t0.selectedIndex==2){
+				}else if(t0s==2){
 						if(time_now-time_then[0]>=ms){
 							pass=true;
 						}
-				}else if(t0.selectedIndex==3){
+				}else if(t0s==3){
 						if(time_then[0]	>=ms){
 							pass=true;
 						}
 				}
-				if(pass){
-					filt.push([item,time_then]);
-				}
-			});
-	return filt;
+				return [pass,time_then];
+}
+
+function timeFilter(historyItemsRaw){
+		let historyItems=pre_timeFilter(historyItemsRaw);
+		if(ts.selectedIndex===1){
+			return historyItems;
+		}else{
+			let filt=[[],[],[]];
+			let dmns=[];	
+			let unq=[];	
+			for (let i=0, len_i=historyItems[0].length; i<len_i; i++){
+						let item=historyItems[0][i];
+						let pass=inTimeLimit(item);
+						if(pass[0]){
+							filt[0].push(item);
+							dmns.push(item.domain);
+							filt[2].push(pass[1]);
+						}
+			}
+			filt[1]=Array.from( new Set(dmns) );
+			return filt;
+		}
 }
 
 var constructHistory = function (historyItems) {
@@ -212,7 +285,7 @@ var constructHistory = function (historyItems) {
     }else{
 
 		historyItemsThen=timeFilter(historyItems);
-		historyItems=historyItemsThen.map((h)=>{return h[0];});
+		historyItems=historyItemsThen[0].map((h)=>{return h;});
 		
 		historyItems.forEach(function (item,index) {
 				var tr = trOriginal.clone();
@@ -222,7 +295,7 @@ var constructHistory = function (historyItems) {
 				let ttl=tr.find("p.info_title a.title");
 					ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
 				//tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
-				tr.find("p.info_time span.time_info").text(historyItemsThen[index][1][1]);
+				tr.find("p.info_time span.time_info").text(historyItemsThen[2][index][1]);
 				let full=tr.find("p.info_url a.full_url");
 				full.text(item.url).attr('href', item.url);
 				if((item.title === item.url) || item.title==='' ){
@@ -298,24 +371,15 @@ function attachCheckEvts(){
 var constructNavigationOptions = function (historyItems) {
     var searchForm = $("#searchForm");
     var checkboxs = document.getElementById("checkboxes");
-    var hostnames = [];
-    var months = [];
+
 	
 	historyItemsThen=timeFilter(historyItems);
-	historyItems=historyItemsThen.map((h)=>{return h[0];});
-	
-    historyItems.forEach(function (item) {
-		let spl3=item.url.split('///')
-		let hst=(spl3.length>1)?spl3[0]:item.url.split('/')[2];
-        hostnames.push(hst);
-        months.push(item);
-    });
-
-    var unique = Array.from(new Set(hostnames)).filter((h)=>{return typeof h!=='undefined';});
+	historyItems=historyItemsThen[0].map((h)=>{return h;});
+	unique=historyItemsThen[1];
 	
 	let nw_unique=[];
-			    
-	for (let i=0; i<unique.length; i++){
+	
+	for (let i=0, len=unique.length; i<len; i++){
 				let dts1=retain_spl_arr(unique[i],'.');
 				let dts='';
 				let dts_f='';
@@ -385,7 +449,7 @@ var constructNavigationOptions = function (historyItems) {
 				}
 	}
 
-	unique=nw_unique.sort(function(a, b) {
+	nw_unique.sort(function(a, b) {
 		if(a[0] < b[0]) { return -1; }
 		if(a[0] > b[0]) { return 1; }
 		if(a[0] === b[0]){
@@ -397,14 +461,14 @@ var constructNavigationOptions = function (historyItems) {
 				
 			let unq=[''];
 			
-	for (let i=0; i<unique.length; i++){
-		if(unique[i][2]!==''){
-			unq.push(unique[i][2]);
+	for (let i=0; i<nw_unique.length; i++){
+		if(nw_unique[i][2]!==''){
+			unq.push(nw_unique[i][2]);
 		}
 	}
-			unique=unq;
+			nw_unique=unq;
 			checkboxs.innerHTML='';
-    unique.forEach(function (item, index) {
+    nw_unique.forEach(function (item, index) {
 		let cb=document.createElement('input');
 		cb.type='checkbox';
 		cb.id='l'+index;
@@ -503,6 +567,13 @@ function textSearch(){
 function title_search(){
 			textSearch();
 			 buildNavigationOptions();
+}
+
+ts.oninput=()=>{
+	if(!expanded && ts.selectedIndex===1){
+		selBox.click();
+	}
+	title_search();
 }
 
 t0.oninput=()=>{
