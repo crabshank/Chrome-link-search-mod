@@ -296,14 +296,14 @@ var constructHistory = function (historyItems) {
 					ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
 				//tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
 				let ti=tr.find("p.info_time span.time_info");
+				let tm=historyItemsThen[2][index];
 				if(index===0){
-					let tm=historyItemsThen[2][index];
 					let tms=tm[1]+' ('+tm[2]+')';
 					ti.text(tms);
 				}else{
-					ti.text(historyItemsThen[2][index][1]);
+					ti.text(tm[1]);
 				}
-				ti[0].title=historyItemsThen[2][index][2];
+				ti[0].title=tm[2];
 				let full=tr.find("p.info_url a.full_url");
 				full.text(item.url).attr('href', item.url);
 				if((item.title === item.url) || item.title==='' ){
