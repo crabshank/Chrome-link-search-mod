@@ -295,7 +295,15 @@ var constructHistory = function (historyItems) {
 				let ttl=tr.find("p.info_title a.title");
 					ttl.text(item.title ? item.title : item.url).attr('href', item.url).attr('title', item.url);
 				//tr.find("p.info_title span.favicon").css('content', 'url("chrome://favicon/' + item.url + '")');
-				tr.find("p.info_time span.time_info").text(historyItemsThen[2][index][1]);
+				let ti=tr.find("p.info_time span.time_info");
+				if(index===0){
+					let tm=historyItemsThen[2][index];
+					let tms=tm[1]+' ('+tm[2]+')';
+					ti.text(tms);
+				}else{
+					ti.text(historyItemsThen[2][index][1]);
+				}
+				ti[0].title=historyItemsThen[2][index][2];
 				let full=tr.find("p.info_url a.full_url");
 				full.text(item.url).attr('href', item.url);
 				if((item.title === item.url) || item.title==='' ){
@@ -482,7 +490,17 @@ attachCheckEvts();
 var getVisitTime = function (item) {
     let options = {weekday: 'long', day: '2-digit', month: 'long', hour: '2-digit', minute: 'numeric'};
 	let t=item.lastVisitTime;
-    return [t, new Date(t).toLocaleTimeString("en-GB", options)];
+	let tz= -(new Date().getTimezoneOffset() / 60);
+	tz=(tz===-0)?0:tz;
+	let tzn=tz.toLocaleString('en-GB', {minimumFractionDigits: 0, maximumFractionDigits: 7});
+	let tzt='';
+	if(tz>0){
+		tzt='+'+tzn;
+	}else if (tz<0){
+		tzt=tzn;
+	}
+	tz.toLocaleString('en-GB', {minimumFractionDigits: 0, maximumFractionDigits: 7}) 
+    return [t, new Date(t).toLocaleTimeString("en-GB", options),('GMT'+tzt)];
 }
 
 var resetRemoveCheckBoxes = function (recordType) {
