@@ -172,7 +172,9 @@ function domainTimeFilter(unique,hostnames_ixs,historyItems){
 			}
 		}
 		if(inLimit===true){
-			filtHist.push(...ij);
+			for(let ix=0, len=ij.length; ix<len; ix++){
+					filtHist.push(ij[ix]);
+			}
 			out[1].push(unique[i]);
 		}
 	}
