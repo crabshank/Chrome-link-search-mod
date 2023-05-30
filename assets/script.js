@@ -705,6 +705,7 @@ function showCheckboxes() {
         let chkd=items.filter(':checked');
 		
 		function postBtn_act(){
+					$("input#allHistories")[0].checked=false;
 					$('button#removeHistory').prop('checked', false).closest('tr.item').hide();
 									
 				items = $("#" + recordType + "Container tr.item input[name='" + recordType + "[]']");
