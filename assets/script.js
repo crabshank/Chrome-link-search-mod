@@ -103,6 +103,7 @@ var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) 
 		}
 		
 		constructHistory(filtHist);
+		constructNavigationOptions(filtHist);
 						updHistChk();
 	}
 	});
