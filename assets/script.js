@@ -40,7 +40,14 @@ async function tabs_discard(d){
 	});
 }
 
-var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) {
+var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp,searchInput) {
+	if(searchInput===true){
+		let ticked=[...document.getElementById('checkboxes').querySelectorAll('input[type="checkbox"]:checked')];
+		
+		for (let i=0; i<ticked.length; i++){
+			ticked[i].checked=false;
+		}
+	}
 	if((clear && !reGatherChecked) || startUp){
 		 buildNavigationOptions();
 	}
@@ -102,9 +109,14 @@ var searchHistory = function (filterArr,clear,titleToo,reGatherChecked,startUp) 
 			}
 		}
 		
-		constructHistory(filtHist);
-		constructNavigationOptions(filtHist);
-						updHistChk();
+		
+		if(searchInput===true){
+			constructHistory(filtHist);
+			constructNavigationOptions(filtHist);
+		}else{
+			constructHistory(filtHist);
+			updHistChk();
+		}
 	}
 	});
 	
@@ -577,12 +589,12 @@ t1.style.display='none';
 t2.style.display='none';
 t3.style.display='none';
 
-function textSearch(){
+function textSearch(searchInput){
 			 let text =  $("#searchTerm")[0].value;
 		if(text!==''){
-			searchHistory([text],false,true,true,false);
+			searchHistory([text],false,true,true,false,searchInput);
 		}else{
-			  searchHistory([''],false,false,true,false);
+			  searchHistory([''],false,false,true,false,searchInput);
 		}
 }
 function title_search(){
@@ -670,7 +682,7 @@ function showCheckboxes() {
 }
 
     $("#searchTerm").on("input", function (event) {
-			textSearch();
+			textSearch(true);
     });
 	
 	$('button#clearTerm').on("mouseup", function (e) {
