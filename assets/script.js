@@ -598,8 +598,8 @@ function textSearch(searchInput){
 		}
 }
 function title_search(){
-			textSearch();
-			 buildNavigationOptions();
+			textSearch(true);
+			 //buildNavigationOptions();
 }
 
 ts.oninput=()=>{
