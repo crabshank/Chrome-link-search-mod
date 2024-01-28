@@ -514,7 +514,6 @@ var getVisitTime = function (item) {
 	}else if (tz<0){
 		tzt=tzn;
 	}
-	tz.toLocaleString('en-GB', {minimumFractionDigits: 0, maximumFractionDigits: 7}) 
     return [t, new Date(t).toLocaleTimeString("en-GB", options),('GMT'+tzt)];
 }
 
