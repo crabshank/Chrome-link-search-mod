@@ -869,7 +869,6 @@ if(chkd.length>=1){
 	
 	$('hr#divider').on("dblclick", function () {
         overDivd.over=(overDivd.over)?overDivd.over:false;
-		$('hr#divider')[0].style.setProperty( 'position','absolute' );
 		$('hr#divider')[0].style.setProperty( 'top',(overDivd.defTop+3)+'px' );
 		 let chk=document.getElementById("checkboxes");
 		   let chkRct=chk.getBoundingClientRect();
@@ -892,7 +891,6 @@ if(chkd.length>=1){
        if(overDivd.over && e.buttons>0){	
 		   let chk=document.getElementById("checkboxes");
 		   let chkRct=chk.getBoundingClientRect();
-		   $('hr#divider')[0].style.setProperty( 'position','absolute' );
 		   let tp=Math.max(e.pageY,chkRct.top);
 		   $('hr#divider')[0].style.setProperty( 'top',(tp+2)+'px' );
 		  chk.style.setProperty( 'height',Math.max(0,tp-chkRct.top-$('hr#divider')[0].clientHeight-4)+'px' );

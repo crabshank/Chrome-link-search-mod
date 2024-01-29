@@ -1,3 +1,7 @@
+body {
+    background-color: #141414;
+}
+
 /*table */
 .container {
     width: 700px;
@@ -22,9 +26,9 @@
 .item_table thead span.th-nav.th-manage a{
     float: right;
     padding: 8px;
-    color: red;
+    color: #ececec;
     margin-bottom: 2px;
-    margin-right: 15px;
+    margin-right: 0px;
 }
 
 
@@ -39,23 +43,23 @@
 }
 
 
-.item_table tr:nth-child(even) {
-    background-color: #f2f2f2;
+tbody tr:nth-child(even) {
+    background-color: #c9ffed;
 }
 
-.item_table tr:nth-child(odd) {
-    background-color: #F2F2EA;
+tbody tr:nth-child(odd) {
+    background-color: #d0e5e0;
 }
 
 .item_table a.title {
-    color: #1a0dab;
+    color: #9043cc;
     font-size: 17px;
-    font-weight: 400;
+    font-weight: bolder;
     overflow-wrap:anywhere;
 }
 
 .item_table a.full_url {
-    color: #006621;
+    color: #0e5704;
     word-break: break-word;
 }
 
@@ -71,27 +75,29 @@
 
 /* Form*/
 
-	hr#divider{
-		margin-block-start: -2px;
-		margin-block-end: 1px;
-		height: 4px;
-		background: buttonface;
-		width: -webkit-fill-available;
-		border-style: none;
-		display: none;
-		transform-origin: 0px 0px;
-	}
+hr#divider {
+    margin-block-start: -2px;
+    margin-block-end: 1px;
+    height: 4px;
+    background: buttonface;
+    width: -webkit-fill-available;
+    border-style: none;
+    display: none;
+    transform-origin: 0px 0px;
+    margin-right: 12px;
+	position:absolute;
+}
 	
-	hr#divider:hover{
-		cursor: row-resize;
-	}
+hr#divider:hover{
+	cursor: row-resize;
+}
 
 section#textFilt{
 	display: inline-flex;
 }
 
-button#clearTerm{
-	width: fit-content;
+button#clearTerm {
+    width: fit-content;
     height: 32px;
     padding-right: 13px;
     padding-left: 13px;
@@ -99,14 +105,16 @@ button#clearTerm{
     background: buttonface;
     padding-top: 3px;
     margin-bottom: 2px;
+    border: 2px white outset;
 }
 
 .searchForm input {
     vertical-align: middle;
     margin: 8px 5px 10px 0px;
     padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: transparent;
+	color: #dbf200;
+    border: 1px solid #00f6e6;
     border-radius: 4px;
     height: 12px;
     font-size: 15px;
@@ -117,10 +125,21 @@ button#clearTerm{
     margin: 5px 5px 5px 0;
     padding: 5px;
     font-size: 16px;
-    border: 0px;
+    border: 1px;
     height: 34px;
-    background-color: #fff;
+    background-color: transparent;
     border-radius: 4px;
+    color: #dbf200;
+    border-color: #00f6e6;
+    border-style: outset;
+}
+
+select:focus-visible {
+    outline: initial;
+}
+
+option {
+    background-color: #141414;
 }
 
 /* end Form*/
@@ -129,6 +148,7 @@ button#clearTerm{
     position: relative;
     font-size: 18px;
     font-weight: bold;
+    padding-left: 5px;
 }
 
 #checkboxes {
@@ -139,8 +159,13 @@ button#clearTerm{
 }
 
 #checkboxes label {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
+    font-size: 0.769lh;
+}
+
+section#multiselect_time {
+    line-height: 177%;
 }
 
 #checkboxes label:hover {
@@ -165,16 +190,16 @@ section#searchForm{
     width: -webkit-fill-available;
     vertical-align: middle;
     margin: -3px 5px 5px 0px;
-    padding: 1px 0px 4px 6px;
-    background-color: #fff;
-    border: 1px solid #3c3c3c;
+    padding: 3px 0px 3px 0px;
+    background-color: transparent;
+    border: 1px solid #d7d7d7;
     border-radius: 4px;
+	color: white;
 }
 
 /* Style the tab */
 .tab {
     overflow: hidden;
-    background-color: #f1f1f1;
 }
 
 /* Style the buttons inside the tab */
@@ -209,18 +234,23 @@ button.right {
 }
 
 button.action {
-	white-space: break-spaces;
-	min-height: 9ch;
+    white-space: break-spaces;
+    min-height: 9ch;
     padding: 8px;
-    border: 1px solid red;
-    color: #ba0000;
+    border: 1px solid #00f6e6;
+    color: #ececec;
     border-radius: 4px;
     margin-bottom: 2px;
     margin-left: 5px;
     font-weight: bold;
-    background-color: transparent;
+	background-color: transparent;
+    font-size: 1.8ch;
 }
 
 button.action:hover {
-    background-color: #ccc;
+    background-color: #040734;
+}
+
+thead {
+    background-color: #242424;
 }
