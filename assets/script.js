@@ -258,7 +258,7 @@ function timeFilter(historyItemsRaw){
 			for (let i=0, len_i=historyItems[0].length; i<len_i; i++){
 						let item=historyItems[0][i];
 						let pass=inTimeLimit(item);
-						if(pass[0]){
+						if(pass[0] && typeof(item)!=='undefined' && typeof(item.domain)!=='undefined'){
 							filt[0].push(item);
 							dmns.push(item.domain);
 							filt[2].push(pass[1]);
