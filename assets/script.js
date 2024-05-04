@@ -147,32 +147,10 @@ function getAdjDateTimeOffset(thenTime, outISO,ignoreTimeZones,offst){
 	}
 }
 
-
-function pre_timeFilter(historyItems){
-	var unique= []; //unique hostnames
-    var hostnames_ixs={};
-    historyItems.forEach(function (item,index) {
-		let spl3=item.url.split('///')
-		let hst=(spl3.length>1)?spl3[0]:item.url.split('/')[2];
-		item.domain=hst;
-		if(!unique.includes(hst)){
-			unique.push(hst);
-			hostnames_ixs[hst]=[index];
-		}else{
-			hostnames_ixs[hst].push(index);
-		}
-    });
-	if(ts.selectedIndex===1){			
-		return domainTimeFilter(unique,hostnames_ixs,historyItems);
-	}else{
-		return [historyItems,unique]
-	}
-}
-
 function domainTimeFilter(unique,hostnames_ixs,historyItems){
 	let filtHist=[];
 	let histTimes=[];
-	let out=[[],[],[]];
+	let out=[[],[],[],[]];
 	for (let i=0, len_i=unique.length; i<len_i; i++){
 		let ij=hostnames_ixs[unique[i]]; //array of indexes
 		let inLimit=true;
@@ -189,6 +167,7 @@ function domainTimeFilter(unique,hostnames_ixs,historyItems){
 					filtHist.push(ij[ix]);
 			}
 			out[1].push(unique[i]);
+			out[3].push(  hostnames_ixs[ unique[i]  ].length);
 		}
 	}
 	
@@ -197,6 +176,27 @@ function domainTimeFilter(unique,hostnames_ixs,historyItems){
 		out[2].push(histTimes[ filtHist[j] ]);
 	}
 	return out;
+}
+
+function pre_timeFilter(historyItems){
+	var unique= []; //unique hostnames
+    var hostnames_ixs={};
+    historyItems.forEach(function (item,index) {
+		let spl3=item.url.split('///')
+		let hst=(spl3.length>1)?spl3[0]:item.url.split('/')[2];
+		item.domain=hst;
+		if(!unique.includes(hst)){
+			unique.push(hst);
+			hostnames_ixs[hst]=[index];
+		}else{
+			hostnames_ixs[hst].push(index);
+		}
+    });
+	//if(ts.selectedIndex===1){			
+		return domainTimeFilter(unique,hostnames_ixs,historyItems);
+	/*}else{
+		return [historyItems,unique]
+	}*/
 }
 
 function inTimeLimit(i){
@@ -250,6 +250,7 @@ function inTimeLimit(i){
 function timeFilter(historyItemsRaw){
 		let historyItems=pre_timeFilter(historyItemsRaw);
 		if(ts.selectedIndex===1){
+			
 			return historyItems;
 		}else{
 			let filt=[[],[],[],[]];
