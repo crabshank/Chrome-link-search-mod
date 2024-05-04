@@ -192,11 +192,11 @@ function pre_timeFilter(historyItems){
 			hostnames_ixs[hst].push(index);
 		}
     });
-	//if(ts.selectedIndex===1){			
+	if(ts.selectedIndex===1){			
 		return domainTimeFilter(unique,hostnames_ixs,historyItems);
-	/*}else{
+	}else{
 		return [historyItems,unique]
-	}*/
+	}
 }
 
 function inTimeLimit(i){
@@ -250,7 +250,6 @@ function inTimeLimit(i){
 function timeFilter(historyItemsRaw){
 		let historyItems=pre_timeFilter(historyItemsRaw);
 		if(ts.selectedIndex===1){
-			
 			return historyItems;
 		}else{
 			let filt=[[],[],[],[]];
